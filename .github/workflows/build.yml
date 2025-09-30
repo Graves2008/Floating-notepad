@@ -1,0 +1,28 @@
+name: Build Floating Notepad
+
+on:
+  workflow_dispatch:   # lets you run it manually from GitHub site
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download 7-Zip
+        run: choco install 7zip -y
+
+      - name: Create archive
+        run: 7z a FloatingNotepad.7z metapad.exe glass2k.exe readme.txt
+
+      - name: Build SFX
+        run: |
+          copy /b "C:\ProgramData\chocolatey\lib\7zip\tools\7z.sfx" + config.txt + FloatingNotepad.7z FloatingNotepad.exe
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: FloatingNotepad
+          path: FloatingNotepad.exe
