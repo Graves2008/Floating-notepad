@@ -1,7 +1,10 @@
 name: Build Floating Notepad
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # run manually from Actions tab
+  push:               # also run automatically on push to main
+    branches:
+      - main
 
 jobs:
   build:
@@ -9,20 +12,26 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4   # updated
+        uses: actions/checkout@v4
 
-      - name: Download 7-Zip
+      - name: Install 7-Zip
         run: choco install 7zip -y
 
-      - name: Create archive
-        run: 7z a FloatingNotepad.7z metapad.exe glass2k.exe readme.txt
-
-      - name: Build SFX
+      - name: Create archive (with optional readme)
+        shell: pwsh
         run: |
-          copy /b "C:\ProgramData\chocolatey\lib\7zip\tools\7z.sfx" + config.txt + FloatingNotepad.7z FloatingNotepad.exe
+          if (Test-Path readme.txt) {
+            7z a -y FloatingNotepad.7z metapad.exe glass2k.exe readme.txt
+          } else {
+            7z a -y FloatingNotepad.7z metapad.exe glass2k.exe
+          }
+
+      - name: Build SFX EXE
+        shell: cmd
+        run: copy /b "C:\ProgramData\chocolatey\lib\7zip\tools\7z.sfx" + config.txt + FloatingNotepad.7z FloatingNotepad.exe
 
       - name: Upload EXE artifact
-        uses: actions/upload-artifact@v4   # ✅ use v4
+        uses: actions/upload-artifact@v4
         with:
           name: FloatingNotepad
           path: FloatingNotepad.exe
