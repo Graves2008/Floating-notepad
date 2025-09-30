@@ -1,7 +1,7 @@
 name: Build Floating Notepad
 
 on:
-  workflow_dispatch:   # lets you run it manually from GitHub site
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4   # updated
 
       - name: Download 7-Zip
         run: choco install 7zip -y
@@ -22,7 +22,7 @@ jobs:
           copy /b "C:\ProgramData\chocolatey\lib\7zip\tools\7z.sfx" + config.txt + FloatingNotepad.7z FloatingNotepad.exe
 
       - name: Upload EXE artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   # ✅ use v4
         with:
           name: FloatingNotepad
           path: FloatingNotepad.exe
